@@ -6,6 +6,7 @@ from aws_cdk import (
     aws_sqs as sqs,
     aws_sns as sns,
     aws_sns_subscriptions as subs,
+    aws_lambda as _lambda
 )
 
 
@@ -14,13 +15,10 @@ class CdkWorkshopStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        queue = sqs.Queue(
-            self, "CdkWorkshopQueue",
-            visibility_timeout=Duration.seconds(300),
+        # Defines an AWS Lambda resource
+        my_lambda = _lambda.Function(
+            self, 'HelloHandler',
+            runtime=_lambda.Runtime.PYTHON_3_13,
+            code=_lambda.Code.from_asset('lambda'), # the sub-directory
+            handler='hello.handler', # file 'hello.py', function 'handler'
         )
-
-        topic = sns.Topic(
-            self, "CdkWorkshopTopic"
-        )
-
-        topic.add_subscription(subs.SqsSubscription(queue))
