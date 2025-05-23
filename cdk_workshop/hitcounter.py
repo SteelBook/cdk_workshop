@@ -28,3 +28,6 @@ class HitCounter(Construct):
                 'HITS_TABLE_NAME': table.table_name,
             }
         )
+
+        table.grant_read_write_data(self._handler) # grant the Lambda function permission to read and write to the DynamoDB table
+        downstream.grant_invoke(self._handler)     # grant the downstream Lambda function permission to be invoked by the hit counter
