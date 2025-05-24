@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_dynamodb as ddb,
 )
+from aws_cdk import RemovalPolicy
 
 class HitCounter(Construct):
 
@@ -20,7 +21,9 @@ class HitCounter(Construct):
 
         self._table = ddb.Table(
             self, 'Hits',
-            partition_key={'name': 'path', 'type': ddb.AttributeType.STRING}
+            partition_key={'name': 'path', 'type': ddb.AttributeType.STRING},
+            removal_policy=RemovalPolicy.DESTROY # (NB) override default behavior of keeping the table when the stack is deleted
+            # (NB) "this is not a good idea for production code, but it's ok for our workshop"
         )
 
         self._handler = _lambda.Function(
