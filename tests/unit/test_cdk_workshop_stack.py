@@ -47,3 +47,18 @@ def test_lambda_has_env_vars():
                 "HITS_TABLE_NAME": {"Ref": "HitCounterHits079767E5"}, # "XXXXX" = "079767E5"
                 },
             }
+
+def test_dynamodb_with_encryption():
+    stack = Stack()
+    HitCounter(stack, "HitCounter",
+            downstream=_lambda.Function(stack, "TestFunction",
+                runtime=_lambda.Runtime.PYTHON_3_13,
+                handler='hello.handler',
+                code=_lambda.Code.from_asset('lambda')))
+
+    template = assertions.Template.from_stack(stack)
+    template.has_resource_properties("AWS::DynamoDB::Table", {
+        "SSESpecification": {
+            "SSEEnabled": True,
+            },
+        })

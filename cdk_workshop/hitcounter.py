@@ -22,7 +22,8 @@ class HitCounter(Construct):
         self._table = ddb.Table(
             self, 'Hits',
             partition_key={'name': 'path', 'type': ddb.AttributeType.STRING},
-            removal_policy=RemovalPolicy.DESTROY # (NB) override default behavior of keeping the table when the stack is deleted
+            encryption=ddb.TableEncryption.AWS_MANAGED, # use AWS managed encryption for the DynamoDB table
+            removal_policy=RemovalPolicy.DESTROY, # (NB) override default behavior of keeping the table when the stack is deleted
             # (NB) "this is not a good idea for production code, but it's ok for our workshop"
         )
 
