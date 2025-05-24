@@ -16,7 +16,18 @@ class HitCounter(Construct):
     def table(self):
         return self._table
 
-    def __init__(self, scope: Construct, id: str, downstream: _lambda.IFunction, **kwargs):
+    def __init__(
+        self,
+        scope: Construct,
+        id: str,
+        downstream: _lambda.IFunction,
+        read_capacity: int = 5, # "added a read_capacity parameter to the constructor"
+        **kwargs
+        ):
+        # "added a check to ensure that read_capacity is between 5 and 20":
+        if read_capacity < 5 or read_capacity > 20:
+            raise ValueError("readCapacity must be greater than 5 or less than 20")
+        
         super().__init__(scope, id, **kwargs)
 
         self._table = ddb.Table(
@@ -25,6 +36,7 @@ class HitCounter(Construct):
             encryption=ddb.TableEncryption.AWS_MANAGED, # use AWS managed encryption for the DynamoDB table
             removal_policy=RemovalPolicy.DESTROY, # (NB) override default behavior of keeping the table when the stack is deleted
             # (NB) "this is not a good idea for production code, but it's ok for our workshop"
+            read_capacity=read_capacity, # "set the read capacity of the table to the value passed in the constructor"
         )
 
         self._handler = _lambda.Function(
